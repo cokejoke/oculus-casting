@@ -1,7 +1,7 @@
 {
   "displayName": "Oculus Casting",
   "name": "oculus-casting",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A wrapper for the Oculus Casting Site written in Electron.",
   "main": "src/main.js",
   "resources": "src/resources",
@@ -10,8 +10,7 @@
     "email": "justin@knoter.eu"
   },
   "scripts": {
-    "start": "electron .",
-    "build": "./node_modules/.bin/electron-builder"
+    "start": "electron ."
   },
   "repository": "https://github.com/cokejoke/oculus-casting",
   "keywords": [

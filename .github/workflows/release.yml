@@ -76,8 +76,6 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-      - name: Build src code
-        run: npm run build:src
 
       - name: Release package
         run: |
@@ -122,8 +120,6 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-      - name: Build src code
-        run: npm run build:src
 
       - name: Release package
         run: |

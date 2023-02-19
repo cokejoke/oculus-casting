@@ -1,7 +1,7 @@
 {
   "displayName": "Oculus Casting",
   "name": "oculus-casting",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A wrapper for the Oculus Casting Site written in Electron.",
   "main": "src/main.js",
   "resources": "src/resources",

@@ -1,0 +1,41 @@
+/* styles.css */
+
+/* Add styles here to customize the appearance of your app */
+:root {
+    --ocds-typography-black-3: white !important;
+    --ocds-background-black-0: #1c1c1f !important;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #1c1e20 !important;
+}
+
+section > div:first-child, section > div:first-child > div:first-child {
+    background: #1c1e20 !important;
+}
+
+section > div:first-child > div:first-child span {
+    color: #efefef !important;
+}
+
+nav div[role="list"]:nth-child(2) {
+    display: none !important;
+}
+
+nav {
+    height: 70px !important;
+}
+
+footer {
+    display: none !important;
+}
+
+section > div:nth-child(2) > a > div {
+    display: none !important;
+}
+
+tr td i {
+    filter: invert(1) !important;
+}

@@ -1,0 +1,31 @@
+{
+  "displayName": "Oculus Casting",
+  "name": "oculus-casting",
+  "version": "1.0.0",
+  "description": "A wrapper for the Oculus Casting Site written in Electron.",
+  "main": "src/main.js",
+  "resources": "src/resources",
+  "author": {
+    "name": "Justin Mankowski",
+    "email": "justin@knoter.eu"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "./node_modules/.bin/electron-builder"
+  },
+  "repository": "https://github.com/cokejoke/oculus-casting",
+  "keywords": [
+    "Electron",
+    "Oculus",
+    "Quest 2",
+    "Oculus Casting",
+    "Quest",
+    "Quest Casting",
+    "Meta Casting"
+  ],
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^23.1.0",
+    "electron-builder": "^23.6.0"
+  }
+}

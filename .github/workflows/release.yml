@@ -1,43 +1,145 @@
-name: Build/release
+name: Build
 
-on: push
+on:
+  push:
+    branches:
+      - master
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-
+  Windows:
+    name: Windows
+    runs-on: windows-latest
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
+      - name: Check out git repository
+        uses: actions/checkout@v3
 
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: '16'
 
-      - name: apt-update
-        if: startsWith(matrix.os, 'ubuntu-latest')
-        run: sudo apt-get update
-
-      - name: autoremove
-        if: startsWith(matrix.os, 'ubuntu-latest')
-        run: sudo apt autoremove
-
-      - name: Install libarchive rpm on Linux
-        if: startsWith(matrix.os, 'ubuntu-latest')
-        run: sudo apt-get install libarchive-tools rpm
-
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
+      - name: Cache file
+        uses: actions/cache@v3
         with:
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.github_token }}
+          path: |
+            node_modules
+            %APPDATA%\npm-cache
+            %LOCALAPPDATA%\electron\Cache
+            %LOCALAPPDATA%\electron-builder\Cache
+          key: ${{ runner.os }}-build-caches-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+      - name: Install Dependencies
+        run: |
+          npm install
+      - name: Build src code
+        run: npm run build:src
 
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Release package
+        run: |
+          npm run publish:win:setup:x64:always
+          npm run publish:win:7z:x64
+          npm run publish:win:setup:x86
+          npm run publish:win:7z:x86
+          npm run publish:win:setup:arm64
+          npm run publish:win:7z:arm64
+          npm run publish:win:setup:x86_64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BT_TOKEN: ${{ secrets.BT_TOKEN }}
+
+      - name: Generate file MD5
+        run: |
+          cd build
+          Get-FileHash *.exe,*.7z -Algorithm MD5 | Format-List
+  Mac:
+    name: Mac
+    runs-on: macos-latest
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Cache file
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            $HOME/.cache/electron
+            $HOME/.cache/electron-builder
+            $HOME/.npm/_prebuilds
+          key: ${{ runner.os }}-build-caches-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+      - name: Install Dependencies
+        run: |
+          npm install
+      - name: Build src code
+        run: npm run build:src
+
+      - name: Release package
+        run: |
+          npm run publish:mac:dmg:always
+          npm run publish:mac:dmg:arm64
+        env:
+          ELECTRON_CACHE: $HOME/.cache/electron
+          ELECTRON_BUILDERCACHE: $HOME/.cache/electron-builder
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BT_TOKEN: ${{ secrets.BT_TOKEN }}
+
+      - name: Generate file MD5
+        run: |
+          cd build
+          md5 *.dmg
+  Linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install package
+        run: sudo apt-get update && sudo apt-get install -y rpm libarchive-tools
+
+      - name: Check out git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Cache file
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            $HOME/.cache/electron
+            $HOME/.cache/electron-builder
+            $HOME/.npm/_prebuilds
+          key: ${{ runner.os }}-build-caches-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+      - name: Install Dependencies
+        run: |
+          npm install
+      - name: Build src code
+        run: npm run build:src
+
+      - name: Release package
+        run: |
+          npm run publish:linux:deb:x64:always
+          npm run publish:linux:deb:arm64
+          npm run publish:linux:deb:armv7l
+          npm run publish:linux:appImage
+          npm run publish:linux:rpm
+          npm run publish:linux:pacman
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BT_TOKEN: ${{ secrets.BT_TOKEN }}
+
+      - name: Generate file MD5
+        run: |
+          cd build
+          md5sum *.deb *.rpm *.pacman *.AppImage
